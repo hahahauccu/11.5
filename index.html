@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pose Matching Game</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      overflow: hidden;
+    }
+    canvas, video {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      object-fit: cover;
+    }
+    #startBtn, #restartBtn {
+      position: absolute;
+      z-index: 10;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 1em 2em;
+      font-size: 1.2em;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 12px;
+    }
+    #restartBtn {
+      display: none;
+    }
+    #poseImage {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 33vh;
+      border: 3px solid white;
+      border-radius: 12px;
+      z-index: 5;
+      background: rgba(0, 0, 0, 0.2);
+    }
+    #completionText {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: yellow;
+      font-size: 2em;
+      display: none;
+      z-index: 10;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.16.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+</head>
+<body>
+  <button id="startBtn">開始遊戲</button>
+  <button id="restartBtn">重新開始</button>
+  <div id="completionText">🎉 全部完成！</div>
+  <img id="poseImage" src="" alt="Pose" />
+  <video id="video" autoplay playsinline muted></video>
+  <canvas id="canvas"></canvas>
+  <script src="script.js"></script>
+</body>
+</html>
