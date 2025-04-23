@@ -17,6 +17,7 @@ const REQUIRED_FRAMES = 30;
 const MAX_FAIL_FRAMES = 10;
 let isPlaying = false;
 
+// 避免 pose5 和 pose7 連在一起
 function shufflePoseOrder() {
   let valid = false;
   while (!valid) {
@@ -79,9 +80,7 @@ function compareKeypointsAngleBased(user, standard) {
     ["left_elbow", "left_shoulder", "left_hip"],
     ["right_elbow", "right_shoulder", "right_hip"]
   ];
-
-  let passed = 0;
-
+  let totalDiff = 0, count = 0;
   for (const [a, b, c] of angles) {
     const aU = user.find(kp => kp.name === a);
     const bU = user.find(kp => kp.name === b);
@@ -89,16 +88,15 @@ function compareKeypointsAngleBased(user, standard) {
     const aS = standard.find(kp => kp.name === a);
     const bS = standard.find(kp => kp.name === b);
     const cS = standard.find(kp => kp.name === c);
-
     if ([aU, bU, cU, aS, bS, cS].every(kp => kp?.score > 0.5)) {
       const angleUser = computeAngle(aU, bU, cU);
       const angleStd = computeAngle(aS, bS, cS);
-      const diff = Math.abs(angleUser - angleStd);
-      if (diff < 20) passed++;
+      totalDiff += Math.abs(angleUser - angleStd);
+      count++;
     }
   }
-
-  return passed >= 5;
+  if (!count) return 1000;
+  return totalDiff / count;
 }
 
 function drawKeypoints(kps, color, radius, alpha) {
@@ -124,8 +122,8 @@ async function detect() {
   if (result.length > 0) {
     const user = result[0].keypoints;
     drawKeypoints(user, 'red', 6, 1.0);
-    const match = compareKeypointsAngleBased(user, currentPose.keypoints);
-    if (match) {
+    const avgDiff = compareKeypointsAngleBased(user, currentPose.keypoints);
+    if (avgDiff < 20) {
       successFrames++;
     } else {
       failFrames++;
@@ -186,9 +184,11 @@ async function startGame() {
   ctx.setTransform(-1, 0, 0, 1, canvas.width, 0);
 
   try {
-    await tf.setBackend('webgl'); await tf.ready();
+    await tf.setBackend('webgl');
+    await tf.ready();
   } catch {
-    await tf.setBackend('wasm'); await tf.ready();
+    await tf.setBackend('wasm');
+    await tf.ready();
   }
 
   detector = await poseDetection.createDetector(
