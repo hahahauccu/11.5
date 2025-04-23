@@ -13,7 +13,7 @@ let standardKeypointsList = [];
 let poseOrder = [];
 let successFrames = 0;
 let failFrames = 0;
-const REQUIRED_FRAMES = 50;
+const REQUIRED_FRAMES = 30;
 const MAX_FAIL_FRAMES = 10;
 let isPlaying = false;
 
